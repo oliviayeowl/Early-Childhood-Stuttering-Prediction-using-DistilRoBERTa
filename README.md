@@ -85,17 +85,6 @@ Ongoing work focuses on improving performance through:
 * dataset expansion
 * refined training procedures
 
-## Repository Structure
-
-```
-.
-├── roberta-stutter/        # RoBERTa training scripts
-├── ml_code/                # data processing and modelling scripts
-├── stutter_model/          # model outputs and experiments
-├── training_data.jsonl     # tagged training dataset
-├── evaluation_reports      # model evaluation outputs
-└── README.md
-```
 
 ## Future Work
 
