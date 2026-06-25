@@ -1,0 +1,14 @@
+# Virtual environments
+stutterenv/
+.venv/
+
+# Model weights and checkpoints
+stutter_model/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store

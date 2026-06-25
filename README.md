@@ -1,143 +1,226 @@
-# Computational Prediction of Early Childhood Stuttering from Disfluency Patterns using DistilRoBERTa
+# Early Childhood Stuttering Detection using DistilRoBERTa
 
 **URECA Undergraduate Research Programme, Nanyang Technological University (2025–26)**  
 **Author:** Yeo Wan Ling | **Supervisor:** Asst. Prof. Li Haoze  
-**School of Humanities**
-
----
-
-## Abstract
-Childhood stuttering affects approximately 5% to 10% of preschool-age children, yet the path from identification to intervention remains obstructed by systemic barriers in many healthcare contexts. Early identification of stuttering-like disfluencies (SLDs) is therefore clinically significant, as children who receive intervention during preschool years are 7.7 times more likely to recover from stuttering. This study asks two questions: whether DistilRoBERTa, a transformer-based language model can effectively detect SLDs from orthographic transcripts of child speech, and whether there is a correlation between stuttered words itself and disfluency types.
-
-The DistilRoBERTa model was trained on 15 transcripts from the Sawyer Corpus (FluencyBank), drawn from spontaneous conversations with children aged 2 to 5. It combines DistilRoBERTa's contextual representations with a part-of-speech embedding channel and a five-dimensional feature vector capturing word position, word type, and utterance length. To avoid overstating performance, a three-tier evaluation framework was used to separate inflated scores driven by easy-to-detect classes from genuine SLD detection. The model achieved a core SLD F1 of 0.33 on part-word and whole-word repetitions, a modest but meaningful result given the small dataset. A complementary syntactic analysis found that SLD-tagged words landed on function words 62.5% of the time against a corpus baseline of 40.2% (chi² = 78.25, p < 0.001), replicating Howell et al.'s (1999) function-word finding for preschool-age children. Together, these results suggest that child speech carries real linguistic signals for automated disfluency detection, and building that knowledge into the model is a promising direction for this task
+**School of Humanities, NTU**
 
 ---
 
 ## Overview
 
-This project investigates whether DistilRoBERTa, a transformer-based language model, can effectively detect stuttering-like disfluencies (SLDs) from orthographic transcripts of child speech, and whether the words children stutter on follow a linguistically principled pattern.
+This project explores the computational detection of early childhood stuttering by identifying and localising stuttering-like disfluencies (SLDs) in orthographic transcripts of child speech. The study investigates whether transformer-based language models can support the analysis of natural child speech data — an area that remains relatively underexplored at the intersection of computational linguistics and speech-language pathology.
 
-Two research questions are explored:
-1. Can DistilRoBERTa detect SLDs — specifically part-word repetitions (PW), whole-word repetitions (WW), and dysrhythmic phonations (DP) — from manually transcribed child speech?
-2. Do stuttered words cluster on function words rather than content words, in line with Howell et al.'s (1999) finding for preschool-age children?
+Using a hybrid modelling approach, the project fine-tunes DistilRoBERTa with BIO tagging to detect and localise SLDs at the token level. A parallel parts-of-speech embedding channel and a linguistically motivated scalar feature vector are incorporated alongside the transformer's contextual representations, grounding the model in established findings from existing literature. A complementary syntactic analysis examines whether disfluent words cluster on function words rather than content words, in line with Howell et al.'s (1999) developmental account of preschool-age stuttering.
+
+---
+
+## Research Motivation
+
+Early identification of stuttering is critical for timely clinical intervention. Children who receive support during the preschool years — between ages 2 and 6 — are 7.7 times more likely to recover from stuttering than those who miss this window (Onslow & O'Brian, 2013). However, the path from identification to treatment is obstructed at multiple stages: a shortage of early interventionists, long waiting times for speech-language therapy, and insufficient spots in early intervention centres.
+
+Traditional analysis of child speech transcripts are labour-intensive and relies on manual annotation by trained clinicians. While prior computational work has explored rule-based and feature-based systems, few studies have applied transformer-based architectures to child speech specifically. Children's disfluency patterns, including higher rates of whole-word repetitions and developmentally shifting stuttering loci, differ meaningfully from those of adults, and models trained on adult corpora cannot simply be transferred to a five-year-old.
+
+This project therefore investigates whether contextual language models, grounded in linguistically motivated features, can assist in identifying SLDs from manually transcribed child speech transcripts.
+
+---
+
+## Research Questions
+
+1. Can DistilRoBERTa effectively detect SLDs, specifically part-word repetitions (PW), whole-word repetitions (WW), and dysrhythmic phonations (DP) from orthographic transcripts of child speech?
+2. Do the words children stutter on cluster on function words rather than content words, in line with Howell et al.'s (1999) finding for preschool-age children?
 
 ---
 
 ## Dataset
 
-**Sawyer Corpus (2017)** sourced from [FluencyBank](https://fluency.talkbank.org/)
-- 17 children aged 2–5, annotated in CHAT/SALT format (`.cha` files)
-- First session only (pre-intervention) for each child
-- 15 transcript files used after excluding 2 corrupted files (Child 4 and Child 16)
+**Sawyer Corpus (2017)** sourced from [FluencyBank](https://fluency.talkbank.org/), a publicly available repository of annotated child speech.
 
-Disfluency annotations follow a bracket notation system: `[^ TAG]` adjacent to the relevant word.
+- 17 children aged 2–5, annotated in CHAT/SALT format (`.cha` files)
+- Each child has 3 sessions; only **Session 1 (pre-intervention)** was used
+- 2 files excluded due to corruption (Child 4 and Child 16)
+- **Final sample: 15 transcript files**
+
+Annotation conventions were clarified directly with the corpus author (Dr. Sawyer). Disfluency annotations follow a bracket notation system: `[^ TAG]` adjacent to the relevant word.
+
+### Disfluency Types
+
+| Code | Label | Type |
+|------|-------|------|
+| `PW` | Part-Word Repetition | SLD |
+| `WW` | Whole-Word Repetition | SLD |
+| `DP` | Dysrhythmic Phonation | SLD |
+| `P` | Phrase Repetition | TD |
+| `R` | Revision | TD |
+| `I` | Interjection | TD |
+| `<>` | Abandoned Utterance | TD |
+| `/` | Sentence Restart | TD |
+| `+` | Incomplete Sentence | TD |
+| `XXX` | Unintelligible | TD |
 
 ---
 
 ## Project Structure
 
 ```
-├── preprocessing.py          # Parses .cha files → BIO-tagged JSONL
-├── distilled_roberta.py      # DistilRoBERTa token classifier (training + evaluation)
-├── syntactic_analysis.py     # POS distribution analysis of disfluent words
-├── disfluencies_count.py     # Descriptive disfluency counts across corpus
+├── preprocessing.py            # Parses .cha files → BIO-tagged JSONL
+├── distilled_roberta.py        # DistilRoBERTa token classifier (train + evaluate)
+├── syntactic_analysis.py       # POS distribution analysis of disfluent words
+├── disfluencies_count.py       # Descriptive disfluency counts across corpus
 │
-├── training_data.jsonl       # Generated by preprocessing.py
-├── test_set_evaluation.jsonl # Generated by preprocessing.py
+├── training_data.jsonl         # Generated by preprocessing.py
+├── test_set_evaluation.jsonl   # Generated by preprocessing.py
+│
 ├── vocab/
-│   ├── label_map.json        # BIO label ↔ integer mappings
-│   └── pos_vocab.json        # POS tag ↔ integer mappings
+│   ├── label_map.json          # BIO label ↔ integer ID mappings
+│   └── pos_vocab.json          # POS tag ↔ integer ID mappings
 │
-└── outputs/                  # Generated by syntactic_analysis.py and model
+└── outputs/                    # Generated outputs
     ├── evaluation_report.txt
+    ├── final_research_results.jsonl
     ├── current_pos_pmi_heatmap.png
     ├── disfluent_word_log.csv
+    ├── disfluency_type_by_current_pos.csv
     ├── pairwise_chisq_fdr_current_pos.csv
     ├── sld_current_pos_vs_corpus_baseline.csv
+    ├── td_current_pos_vs_corpus_baseline.csv
     └── function_vs_content_word_test.csv
 ```
 
 ---
 
-## Pipeline
+## Methodology
 
-### Step 1 — Preprocessing (`preprocessing.py`)
+### 1. Preprocessing (`preprocessing.py`)
 
-Parses raw `.cha` files and produces BIO-tagged JSONL for model training and evaluation.
+Parses raw `.cha` files and produces BIO-tagged JSONL ready for model training and evaluation.
 
-**What it does:**
-- Extracts `*CHI:` speaker lines only
-- Converts CHAT/SALT bracket annotations to BIO tags (e.g. `B-PW`, `I-PW`, `O`)
-- Assigns POS tags via spaCy `en_core_web_sm`; placeholder tokens (`XX`, `INTERJECTION` etc.) receive a null tag `"-"` to prevent spurious POS assignments
-- Computes a 5-dimensional scalar feature vector per token:
-  - `position` — normalised word position (0.0 = first, 1.0 = last)
-  - `is_content` — 1.0 if noun, verb, adjective, or adverb
-  - `is_function` — 1.0 if pronoun, determiner, preposition, or conjunction
-  - `is_other` — 1.0 if neither
-  - `utt_length_z` — z-scored utterance length per child (training utterances only)
-- Splits data: 10 utterances per file → test set; remainder → training set
-- Aligns BIO labels and POS tags to DistilRoBERTa's BPE subword tokenisation
+**Steps:**
+- Extracts `*CHI:` speaker lines only; all other speaker turns are excluded
+- Converts CHAT/SALT bracket annotations to a BIO tagging scheme:
+  - `O` — fluent token
+  - `B-TAG` — onset of a disfluency span
+  - `I-TAG` — continuation of a disfluency span
+- Disfluencies without orthographic representation (`DP`, `I`, `R`, `/`) are assigned placeholder tokens (`XX`, `INTERJECTION`, `RESTARTREVISION`, `RESTARTSENTENCE`) to preserve sequence integrity
+- Assigns POS tags via spaCy `en_core_web_sm`; placeholder tokens receive a null tag `"-"` to prevent spurious POS assignments
+- Computes a **5-dimensional scalar feature vector** per token:
+
+  | Feature | Description |
+  |---------|-------------|
+  | `position` | Normalised word position (0.0 = first word, 1.0 = last) |
+  | `is_content` | 1.0 if noun, verb, adjective, or adverb |
+  | `is_function` | 1.0 if pronoun, determiner, preposition, or conjunction |
+  | `is_other` | 1.0 if neither content nor function |
+  | `utt_length_z` | Z-scored utterance length per child (training utterances only) |
+
+- Splits data: **10 utterances per file → test set**; remainder → training set
+- Aligns BIO labels and POS tags to DistilRoBERTa's BPE subword tokenisation via `SubwordAligner`:
+  - First subword of each word → real BIO label
+  - Continuation subwords → `-100` (ignored in cross-entropy loss)
+  - All subwords of a word → same POS ID (syntactic context preserved)
 - Saves `label_map.json` and `pos_vocab.json` to `vocab/`
 
 ```bash
 python preprocessing.py
+# Set DATASET_PATH inside the script to your .cha transcript directory
 ```
-
-> Set `DATASET_PATH` inside the script to point to your `.cha` transcript directory.
 
 ---
 
-### Step 2 — Model Training & Evaluation (`distilled_roberta.py`)
+### 2. DistilRoBERTa Model (`distilled_roberta.py`)
 
-Trains a custom DistilRoBERTa token classifier and evaluates it on the held-out test set.
+Fine-tunes a custom DistilRoBERTa token classifier for disfluency detection.
 
 **Architecture:**
-- DistilRoBERTa backbone → 768-dim contextual hidden state
-- Parallel POS embedding channel → 32-dim learned embedding (bypasses BPE tokenisation)
-- Scalar feature vector → 5-dim (passed directly to classifier)
-- Concatenated: `[768 ‖ 32 ‖ 5]` → `Linear(805, num_labels)`
+
+```
+Input tokens
+    └── DistilRoBERTa backbone (6 self-attention layers)
+            └── 768-dim contextual hidden state
+
+POS integer IDs
+    └── Learned embedding table (nn.Embedding)
+            └── 32-dim POS embedding
+            (parallel channel — bypasses BPE tokenisation entirely)
+
+Scalar features
+    └── 5-dim vector (passed directly, no embedding lookup)
+
+Concatenated: [768 ‖ 32 ‖ 5] = 805-dim vector per token
+    └── Linear(805, num_labels)
+            └── Label prediction
+```
+
+The POS embedding is injected as a **parallel channel** rather than prepended to the input text, because inserting POS tags into the token string would cause BPE to fragment them into meaningless subword pieces.
 
 **Training details:**
-- 6 epochs, AdamW, lr=2e-5, weight decay=0.01
-- Log-smoothed class-weighted loss to handle severe class imbalance
-- 90/10 train/validation split; best checkpoint by seqeval F1 saved
+
+| Parameter | Value |
+|-----------|-------|
+| Base model | `distilroberta-base` |
+| Epochs | 6 |
+| Optimiser | AdamW |
+| Learning rate | 2e-5 |
+| Weight decay | 0.01 |
+| Batch size | 8 (with gradient accumulation steps = 2) |
+| Train/val split | 90/10 |
+| Loss | Log-smoothed class-weighted cross-entropy |
+| Best checkpoint | Highest seqeval F1 on validation set |
+
+Class weights are computed using sklearn's `balanced` scheme and log-smoothed (`log(1 + w)`) to boost rare classes without overwhelming the loss. `B-MOT` is zeroed out due to noisy annotations.
 
 **Three-tier evaluation:**
 
 | Tier | Labels Included | Notes |
 |------|----------------|-------|
-| All labels | All classes | Inflated by placeholder-identifiable classes |
-| SLD only | PW, WW, DP | Still inflated by DP's XX placeholder |
-| **Core SLD** | **PW, WW** | **Primary metric — honest text-based detection** |
+| All labels | All classes | Inflated by placeholder-identifiable classes (XXX, +, /, I, DP) |
+| SLD only | PW, WW, DP | Still inflated by DP's `XX` placeholder |
+| **Core SLD** | **PW, WW** | **Primary metric — genuine text-based detection** |
+
+DP achieves near-perfect F1 (1.00) by pattern-matching its unique `XX` placeholder — not by learning anything from context. Core SLD F1 is therefore the honest headline metric.
 
 ```bash
 python distilled_roberta.py
+# Requires training_data.jsonl, test_set_evaluation.jsonl, and vocab/ from Step 1
 ```
-
-> Requires `training_data.jsonl`, `test_set_evaluation.jsonl`, and `vocab/` from Step 1.
 
 ---
 
-### Step 3 — Syntactic Analysis (`syntactic_analysis.py`)
+### 3. Syntactic Analysis (`syntactic_analysis.py`)
 
-Tests Howell et al.'s (1999) function-word hypothesis on the Sawyer Corpus.
+Tests Howell et al.'s (1999) function-word finding on the Sawyer Corpus.
 
-**What it does:**
-- Reads both `training_data.jsonl` and `test_set_evaluation.jsonl` (full corpus — counting, not predicting)
-- Extracts POS of the disfluent word for every `B-` tagged token
-- Included types: `PW`, `WW`, `P`, `<>`, `R` (real spoken words only)
-- Excluded types: `DP`, `I`, `/` (no orthographic representation — POS tagging would be a category error)
-- Builds a corpus-wide POS baseline for comparison
+**Design:**
+- Reads **both** `training_data.jsonl` and `test_set_evaluation.jsonl` (full corpus — this is a counting analysis, not a prediction task, so withholding the test set would unnecessarily reduce statistical power)
+- For each `B-` tagged token, records the POS of the disfluent word itself
+- **Included types:** `PW`, `WW`, `P`, `<>`, `R` — all have real spoken words with genuine POS
+- **Excluded types:** `DP`, `I`, `/` — no orthographic representation; POS tagging these placeholder tokens would be a category error
+- Raw spaCy tags mapped to 9 categories: Noun, Verb, Adjective, Adverb, Pronoun, Determiner, Preposition, Conjunction, Interjection
+- Corpus-wide POS baseline established from all tokens for comparison
 
 **Five statistical analyses:**
-1. Global chi-square (disfluency type × POS contingency table)
-2. Pairwise chi-square with Benjamini-Hochberg FDR correction
-3. PMI heatmap (Laplace smoothing α=0.5)
-4. Goodness-of-fit vs corpus baseline (SLD and TD separately)
-5. Function vs content word collapse
+
+| Analysis | Purpose |
+|----------|---------|
+| Global chi-square | Do disfluency types distribute differently across word classes? |
+| Pairwise chi-square + BH FDR correction | Which specific (type, POS) pairs are significant? |
+| PMI heatmap (Laplace α=0.5) | Which pairs associate beyond chance? |
+| Goodness-of-fit vs corpus baseline | Are SLD/TD words drawn from a different POS distribution than the corpus? |
+| Function vs content word collapse | Do SLDs land on function words more than expected? |
 
 ```bash
 python syntactic_analysis.py
+```
+
+---
+
+### 4. Disfluency Counts (`disfluencies_count.py`)
+
+Standalone utility that reads the raw `.cha` files directly and counts occurrences of each disfluency type across the corpus. Useful for descriptive statistics.
+
+```bash
+python disfluencies_count.py
+# Set PATH_TO_DATA inside the script to your .cha transcript directory
+# Outputs: disfluency_stats.csv
 ```
 
 ---
@@ -146,21 +229,33 @@ python syntactic_analysis.py
 
 ### Model Performance
 
-| Tier | Micro F1 |
-|------|----------|
-| All labels | 0.69 |
-| SLD only (PW, WW, DP) | 0.51 |
-| **Core SLD (PW, WW)** | **0.33** |
+| Tier | Micro F1 | Precision | Recall |
+|------|----------|-----------|--------|
+| All labels | 0.69 | 0.66 | 0.73 |
+| SLD only (PW, WW, DP) | 0.51 | 0.46 | 0.58 |
+| **Core SLD (PW, WW)** | **0.33** | **0.29** | **0.40** |
 
-DP achieves near-perfect F1 (1.00) through pattern-matching its `XX` placeholder token — not genuine contextual detection. Core SLD F1 is the honest headline metric.
+Per-class breakdown (Core SLD):
+
+| Class | F1 | Precision | Recall | Support |
+|-------|----|-----------|--------|---------|
+| PW | 0.27 | 0.27 | 0.27 | 11 |
+| WW | 0.37 | 0.29 | 0.50 | 14 |
+
+Both classes show higher recall than precision, consistent with the class-weighted loss encouraging the model to predict disfluency more often at the cost of precision.
 
 ### Syntactic Analysis
 
-- SLD-tagged words landed on **function words 62.5%** of the time vs a corpus baseline of **40.2%** (chi² = 78.25, p < 0.001)
-- Most over-represented: **Pronouns** (+52.7) and **Conjunctions** (+51.9)
-- Most under-represented: **Nouns** (−71.6)
-- PW never occurred on Determiners (count = 0, p_fdr = 0.013)
-- Replicates Howell et al.'s (1999) function-word finding for preschool-age children
+| Finding | Value |
+|---------|-------|
+| SLD function-word rate | 62.5% |
+| Corpus baseline | 40.2% |
+| Chi-square | 78.25, p < 0.001 |
+| Most over-represented POS | Pronouns (+52.7), Conjunctions (+51.9) |
+| Most under-represented POS | Nouns (−71.6) |
+| Notable pairwise finding | PW never occurred on Determiners (count = 0, p_fdr = 0.013) |
+
+Replicates Howell et al.'s (1999) function-word finding for preschool-age children.
 
 ---
 
@@ -171,19 +266,51 @@ pip install torch transformers datasets spacy seqeval scikit-learn pandas numpy 
 python -m spacy download en_core_web_sm
 ```
 
-Tested on Python 3.10+. CPU training supported (no GPU required).
+Tested on Python 3.10+. No GPU required — CPU training is supported.
+
+> **Note:** Before running, update the hardcoded paths in `preprocessing.py` (`DATASET_PATH`) and `disfluencies_count.py` (`PATH_TO_DATA`) to point to your local `.cha` transcript directory.
 
 ---
 
 ## Limitations
 
-- **Data Sparsity** — only 11 PW and 14 WW instances in the test set, too few to produce stable F1 estimates; future work should evaluate on larger child speech corpora.
--  **Dysrhythmic Phonation and Acoustic Features** — acoustic phenomenons have no orthographic form and therefore were not included in analysis; future work should examine surrounding word POS
-- **spaCy POS mismatch** — tagger is trained on fluent adult text; may not accurately tag child speech; future work can explore POS taggers developed within CHILDES or manually verify a sample of POS assignments against the raw transcripts to estimate.
-- **Within-Speaker Leakage** — test set contains unseen utterances from seen speakers, thus model may pick up on speaker-specific patterns rather than real features of child stuttering; leave-one-speaker-out cross-validation (LOSO-CV) is recommended for future work
-- **Noise in Training Data** — manual verification was conducted on approximately 600 lines, and BIO assignments were found to be largely consistent with the source transcripts. though there are 10,790 lines spanning 15 transcript files. however, edge cases such as nested brackets and ambiguous boundary markers, may have introduced inconsistencies in lines outside the verified sample that cannot be fully ruled out.
+- **Within-speaker leakage** — the test set contains unseen utterances from speakers already seen during training. F1 scores reflect generalisation to unseen utterances, not unseen speakers. LOSO-CV is the correct fix.
+- **Data sparsity** — only 11 PW and 14 WW test instances. F1 estimates are unstable at this scale.
+- **spaCy POS mismatch** — `en_core_web_sm` is trained on fluent adult text and may misfire on child speech, particularly around disfluency boundaries.
+- **Attribution confound** — the scalar feature vector and a sampler fix were introduced in the same training run. Their individual contributions cannot be isolated without an ablation study.
+- **DP excluded from syntactic analysis** — DP has no orthographic form; future work should examine surrounding word POS instead.
+- **Annotation noise** — rule-based CHAT parsing was manually verified on ~600 of 10,800 lines. Edge cases in the format may have introduced residual tagging inconsistencies.
+
+---
+
+## Future Work
+
+- **LOSO-CV** — adopt leave-one-speaker-out cross-validation as the default evaluation strategy to measure generalisation to unseen speakers
+- **Ablation study** — toggle each component (POS channel, scalar features, class weighting) independently to isolate their contribution to performance
+- **Word frequency feature** — formally implement and evaluate a SUBTLEX-US word frequency feature, which is theoretically well-motivated but was not verified as active in the current model
+- **Larger corpora** — evaluate on the full FluencyBank collection or UCLASS to address data sparsity and improve statistical reliability
+- **Child speech POS tagger** — explore taggers adapted for child speech (e.g. within the CHILDES ecosystem) to reduce noise from the adult-trained spaCy model
+- **DP acoustic integration** — integrate acoustic features (MFCCs) or disfluency-aware ASR to allow DP to be retained as meaningful input without requiring manual transcription
+- **DP syntactic analysis** — examine POS distribution of words *surrounding* DP events to test whether the function-word skew extends to dysrhythmic phonation
+- **Wider age range** — replicate the syntactic analysis on corpora spanning a broader age range to test Howell et al.'s predicted developmental reversal (function-word → content-word locus around ages 10–12) computationally
+
+---
+
+## Research Context
+
+This project sits at the intersection of:
+- Computational linguistics and NLP
+- Speech-language pathology
+- Child language acquisition
+- Machine learning for clinical language analysis
+
+The work (hopefully!) contributes to ongoing research exploring how transformer-based language models may support the analysis of child speech in clinical and linguistic contexts, with particular focus on the underexplored domain of child stuttering detection from text.
+
+---
 
 
 ## Acknowledgements
 
 Supervised by Asst. Prof. Li Haoze, School of Humanities, NTU. Dataset sourced from the Sawyer Corpus via FluencyBank. Annotation conventions clarified directly with Dr. Sawyer.
+
+This research was supported by Nanyang Technological University under the URECA Undergraduate Research Programme.
