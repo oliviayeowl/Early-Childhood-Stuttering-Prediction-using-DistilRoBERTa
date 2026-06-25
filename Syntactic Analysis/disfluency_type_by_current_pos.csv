@@ -1,0 +1,6 @@
+type,Adjective,Adverb,Conjunction,Determiner,Interjection,Noun,Preposition,Pronoun,Verb
+<>,5,2,1,0,7,2,0,8,2
+P,0,4,14,7,3,9,3,33,13
+PW,5,19,44,0,27,23,7,56,23
+R,3,5,17,10,14,56,5,32,22
+WW,2,29,42,12,33,20,4,72,21

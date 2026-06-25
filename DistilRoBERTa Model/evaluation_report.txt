@@ -1,0 +1,66 @@
+
+=========================================
+RESEARCH EVALUATION REPORT
+=========================================
+Model: distilroberta-base
+Test Set: test_set_evaluation.jsonl (150 utterances)
+
+TEST SET BREAKDOWN BY SOURCE FILE:
+  01-1.cha: 10 utterances
+  02-1.cha: 10 utterances
+  03-1.cha: 10 utterances
+  05-1.cha: 10 utterances
+  06-1.cha: 10 utterances
+  07-1.cha: 10 utterances
+  08-1.cha: 10 utterances
+  09-1.cha: 10 utterances
+  10-1.cha: 10 utterances
+  11-1.cha: 10 utterances
+  12-1.cha: 10 utterances
+  13-1.cha: 10 utterances
+  14-1.cha: 10 utterances
+  15-1.cha: 10 utterances
+  17-1.cha: 10 utterances
+
+SEQEVAL TOKEN-LEVEL METRICS — ALL LABELS:
+              precision    recall  f1-score   support
+
+           +       1.00      1.00      1.00        10
+           /       1.00      1.00      1.00         5
+          <>       0.00      0.00      0.00         4
+          DP       1.00      1.00      1.00        11
+           I       1.00      1.00      1.00        17
+           P       0.20      0.50      0.29         2
+          PW       0.20      0.36      0.26        11
+           R       0.30      0.43      0.35         7
+          WW       0.30      0.43      0.35        14
+         XXX       1.00      1.00      1.00        15
+
+   micro avg       0.64      0.75      0.69        96
+   macro avg       0.60      0.67      0.62        96
+weighted avg       0.70      0.75      0.72        96
+
+
+SEQEVAL TOKEN-LEVEL METRICS — SLD ONLY (PW / WW / DP):
+              precision    recall  f1-score   support
+
+          DP       1.00      1.00      1.00        11
+          PW       0.20      0.36      0.26        11
+          WW       0.30      0.43      0.35        14
+
+   micro avg       0.41      0.58      0.48        36
+   macro avg       0.50      0.60      0.54        36
+weighted avg       0.48      0.58      0.52        36
+
+
+SEQEVAL TOKEN-LEVEL METRICS — CORE SLD ONLY (PW / WW, no DP / P / TD):
+              precision    recall  f1-score   support
+
+          PW       0.20      0.36      0.26        11
+          WW       0.30      0.43      0.35        14
+
+   micro avg       0.25      0.40      0.31        25
+   macro avg       0.25      0.40      0.31        25
+weighted avg       0.26      0.40      0.31        25
+
+=========================================

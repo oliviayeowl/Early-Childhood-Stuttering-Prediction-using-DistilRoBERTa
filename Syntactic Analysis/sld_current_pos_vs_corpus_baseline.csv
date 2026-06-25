@@ -1,0 +1,10 @@
+,observed,expected,obs_minus_exp
+Adjective,7,15.1,-8.1
+Adverb,48,25.7,22.3
+Conjunction,86,34.1,51.9
+Determiner,12,27.0,-15.0
+Interjection,60,52.3,7.7
+Noun,43,114.6,-71.6
+Preposition,11,19.2,-8.2
+Pronoun,128,75.3,52.7
+Verb,44,75.5,-31.5
