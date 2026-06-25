@@ -299,13 +299,13 @@ Tested on Python 3.10+. No GPU required — CPU training is supported.
 ## Research Context
 
 This project sits at the intersection of:
-- Computational linguistics and NLP
-- Speech-language pathology
-- Child language acquisition
-- Machine learning for clinical language analysis
+-Computational Linguistics
+-Natural Language Processing
+-Disfluency Detection
+-Early Childhood Stuttering
+-Speech-Language Pathology
 
 The work (hopefully!) contributes to ongoing research exploring how transformer-based language models may support the analysis of child speech in clinical and linguistic contexts, with particular focus on the underexplored domain of child stuttering detection from text.
-
 ---
 
 
